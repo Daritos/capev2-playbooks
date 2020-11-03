@@ -1,0 +1,16 @@
+[Unit]
+Description=Suricata running in unix socket mode
+Documentation=https://github.com/kevoreilly/CAPEv2
+Wants=cuckoo-rooter.service
+After=cuckoo-rooter.service
+
+[Service]
+Environment=LD_LIBRARY_PATH=/usr/local/lib
+ExecStart=/usr/bin/suricata -c /etc/suricata/suricata.yaml --unix-socket -k none --user {{ cape_user }} --group suricata
+User=root
+Group=root
+Restart=always
+RestartSec=5m
+
+[Install]
+WantedBy=multi-user.target

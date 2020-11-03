@@ -1,0 +1,4 @@
+- name: Deploy Cape V2
+  hosts: localhost
+  become: true
+  roles: ['capev2']

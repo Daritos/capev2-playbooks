@@ -1,0 +1,15 @@
+[Unit]
+Description=Cuckoo socksproxies
+Documentation=https://github.com/kevoreilly/CAPEv2
+Wants=network-online.target
+After=syslog.target network.target
+
+[Service]
+ExecStart=/opt/CAPEv2/socksproxies.sh
+User=root
+Group=root
+Restart=always
+RestartSec=5m
+
+[Install]
+WantedBy=multi-user.target

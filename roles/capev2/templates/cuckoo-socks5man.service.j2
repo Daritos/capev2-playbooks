@@ -1,0 +1,15 @@
+[Unit]
+Description=socks5man
+Documentation=https://github.com/kevoreilly/CAPEv2
+Wants=cuckoo-rooter.service
+After=cuckoo-rooter.service
+
+[Service]
+ExecStart=/usr/local/bin/socks5man verify --repeated
+User={{ cape_user }}
+Group={{ cape_user }}
+Restart=always
+RestartSec=5m
+
+[Install]
+WantedBy=multi-user.target
