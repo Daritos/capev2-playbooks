@@ -1,4 +1,4 @@
 - name: Deploy Cape V2
-  hosts: localhost
+  hosts: cape_host
   become: true
   roles: ['capev2dependencies', 'clamav', 'redsocks2', 'mongodb', 'postgresql', 'suricata', 'tor', 'yara', 'jemalloc', 'capev2', 'customcapev2tweaks', 'capenginx', 'fail2ban']
