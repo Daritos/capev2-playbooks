@@ -1,5 +1,5 @@
 # capev2-playbooks
-This repository contains ansible roles and playbook to deploy CAPEv2 on Ubuntu 20.04 and is based of doomdraven's [cape2.sh](https://github.com/doomedraven/Tools/blob/master/Sandbox/cape2.sh) install script.
+This repository contains ansible roles and playbook to deploy CAPEv2 on Ubuntu 20.04 (may work on other versions as well) and is based of doomdraven's [cape2.sh](https://github.com/doomedraven/Tools/blob/master/Sandbox/cape2.sh) install script.
 
 ## Setup
 Install git
@@ -22,7 +22,7 @@ Install dependencies for ansible
 sudo apt -y install curl python python-dev apt-transport-https ca-certificates software-properties-common
 ```
 
-Add the Ansible repository
+Add the Ansible repository NOTE! Skip if on Ubuntu 20.04
 
 ```bash
 sudo apt-add-repository --yes --update ppa:ansible/ansible
@@ -51,8 +51,8 @@ Insert the following and adjust according to your needs
             "127.0.0.1": null
         },
         "vars" : {
-            "cape_user": "cuckoo",
-            "cape_db_user": "cuckoo",
+            "cape_user": "cape",
+            "cape_db_user": "cape",
             "cape_db_password": "changeme",
             "cape_ip": "127.0.0.1",
             "cape_vm_subnet_ip": "192.168.100.1",
