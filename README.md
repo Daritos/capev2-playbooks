@@ -19,7 +19,6 @@ cd capev2-playbooks
 Install dependencies for ansible
 
 ```bash
-sudo apt update
 sudo apt -y install curl python python-dev apt-transport-https ca-certificates software-properties-common
 ```
 
