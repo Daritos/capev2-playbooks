@@ -13,8 +13,8 @@
 - name: Pin agent ROOT directory
   lineinfile:
     dest: /opt/CAPEv2/analyzer/windows/lib/common/constants.py
-    line: "ROOT = os.path.join(os.getenv(\"SystemDrive\"), "\\\\", \"Logs\")"
-    regexp: "^ROOT ="
+    line: 'ROOT = os.path.join(os.getenv("SystemDrive"), "\\", "Logs")'
+    regexp: '^ROOT ='
 
 ###
 # VMShare

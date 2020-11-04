@@ -51,6 +51,7 @@ Insert the following and adjust according to your needs
             "127.0.0.1": null
         },
         "vars" : {
+            "ansible_python_interpreter": "/usr/bin/python3",
             "cape_user": "cape",
             "cape_db_user": "cape",
             "cape_db_password": "changeme",
