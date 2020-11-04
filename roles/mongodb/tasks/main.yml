@@ -1,0 +1,60 @@
+- name: Install MongoDB dependencies
+  apt:
+    pkg:
+    - libpcre3-dev
+    state: latest
+
+- name: Install MongoDB 4.2 GPG-KEY
+  apt_key:
+    url:  https://www.mongodb.org/static/pgp/server-4.2.asc
+    state: present
+
+- name: Add MongoDB 4.2 repo
+  apt_repository:
+    repo: "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu {{ ansible_distribution_release }}/mongodb-org/4.2 multiverse"
+
+- name: Install MongoDB
+  apt:
+    pkg:
+    - mongodb-org
+    - mongodb-org-mongos
+    - mongodb-org-server
+    - mongodb-org-shell
+    - mongodb-org-tools
+    state: latest
+    update_cache: true
+
+- name: Globaly install pymongo
+  pip:
+    name: pymongo
+    executable: pip3
+
+- name: (Tuning OS for MongoDB) Install sysfsutils
+  apt:
+    pkg:
+    - sysfsutils
+    state: latest
+
+- name: (Tuning OS for MongoDB) Configure transparent_hugepages in /etc/sysfs.conf
+  lineinfile:
+    dest: /etc/sysfs.conf
+    line: "{{ item.name }} = {{ item.value }}"
+    regexp: "^{{ item.name }}"
+    state: present
+  with_items:
+    - name: "kernel/mm/transparent_hugepage/enabled"
+      value: "never"
+    - name: "kernel/mm/transparent_hugepage/defrag"
+      value: "never"
+
+- name: (Tuning OS for MongoDB) Rewrite default mongodb service configuration
+  template:
+    src: mongod.service.j2
+    dest: /etc/systemd/system/mongod.service
+
+- name: Ensure MongoDB is started and enable the service to run on boot
+  systemd:
+    name: mongod
+    state: restarted
+    enabled: true
+    daemon_reload: true

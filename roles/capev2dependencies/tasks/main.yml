@@ -1,0 +1,306 @@
+- name: Install general dependencies
+  apt:
+    pkg:
+    - git
+    - make
+    - build-essential
+    - python3
+    - python3-dev
+    state: latest
+
+- name: Get pip
+  get_url:
+    url: https://bootstrap.pypa.io/get-pip.py
+    dest: /tmp/get-pip.py
+
+- name: Install pip3
+  shell: python3 /tmp/get-pip.py
+
+- name: Make sure python package passlib is present
+  pip:
+    name: passlib
+    state: present
+    executable: pip3
+
+- name: Install Cape dependencies
+  apt:
+    pkg:
+    - psmisc
+    - jq
+    - sqlite3
+    - tmux
+    - net-tools
+    - checkinstall
+    - graphviz
+    - python3-pydot
+    - numactl
+    - libjpeg-dev
+    - zlib1g-dev
+    - upx-ucl
+    - libssl-dev
+    - wget
+    - zip
+    - unzip
+    - p7zip-full
+    - rar
+    - unrar
+    - unace-nonfree
+    - cabextract
+    - geoip-database
+    - libgeoip-dev
+    - mono-utils
+    - ssdeep
+    - libfuzzy-dev
+    - exiftool
+    - uthash-dev
+    - libconfig-dev
+    - libarchive-dev
+    - libtool
+    - autoconf
+    - automake
+    - privoxy
+    - software-properties-common
+    - wkhtmltopdf
+    - xvfb
+    - xfonts-100dpi
+    - tcpdump
+    - libcap2-bin
+    - python3-pil
+    - subversion
+    - uwsgi
+    - uwsgi-plugin-python3
+    - python3-pyelftools
+    - curl
+    - openvpn
+    - wireguard
+    - libre2-dev
+    - openjdk-11-jdk-headless
+    - openjdk-8-jdk-headless
+    state: latest
+
+- name: Install python3 dependencies
+  pip:
+    name:
+    - Pebble
+    - bson
+    - pymisp
+    - cryptography
+    - requests[security]
+    - pyOpenSSL
+    - pefile
+    - tldextract
+    - imagehash
+    - oletools
+    - olefile
+    - "networkx>=2.1"
+    - mixbox
+    - capstone
+    - PyCrypto
+    - voluptuous
+    - xmltodict
+    - future
+    - python-dateutil
+    - requests_file
+    - "gevent==20.4.0"
+    - simplejson
+    - pyvmomi
+    - pyinstaller
+    - maec
+    - regex
+    - xmltodict
+    - git+https://github.com/doomedraven/sflock.git
+    - git+https://github.com/doomedraven/socks5man.git
+    - "pyattck>=2.0.2"
+    - distorm3
+    - openpyxl
+    - git+https://github.com/volatilityfoundation/volatility3
+    - git+https://github.com/DissectMalware/XLMMacroDeobfuscator
+    - passlib
+    - pyzipper
+    - git+https://github.com/Defense-Cyber-Crime-Center/DC3-MWCP.git
+    - git+https://github.com/kevthehermit/RATDecoders.git
+    - "greenlet==0.4.16"
+    - cython
+    - git+https://github.com/andreasvc/pyre2.git
+    - git+https://github.com/jbremer/peepdf.git
+    - "matplotlib>=2.2.2"
+    - "numpy>=1.15.0"
+    - "six>=1.12.0"
+    - "statistics>=1.0.3.5"
+    - "django>3"
+    - git+https://github.com/jsocol/django-ratelimit.git
+    - sqlalchemy
+    - sqlalchemy-utils
+    - jinja2
+    - markupsafe
+    - bottle
+    - chardet
+    - pygal
+    - rarfile
+    - jsbeautifier
+    - dpkt
+    - nose
+    - dnspython
+    - pytz
+    - requests[socks]
+    - python-magic
+    - geoip
+    - pillow
+    - java-random
+    - python-whois
+    - bs4
+    - pype32-py3
+    - git+https://github.com/kbandla/pydeep.git
+    - flask
+    - flask-restful
+    - flask-sqlalchemy
+    - pyvmomi
+    executable: pip3
+
+
+- name: Install dependencies for passivedns
+  apt:
+    pkg:
+    - binutils-dev
+    - libldns-dev
+    - libpcap-dev
+    - libdate-simple-perl
+    - libdatetime-perl
+    - libdbd-mysql-perl
+    state: latest
+
+- name: Download the latest passivedns source from git
+  git:
+    repo: git://github.com/gamelinux/passivedns.git
+    dest: /opt/passivedns
+    force: true
+
+- name: Run autoreconf for the passivedns source
+  shell:
+    cmd: autoreconf --install
+    chdir: /opt/passivedns
+
+- name: Configure build for the passivedns source
+  shell:
+    cmd: ./configure
+    chdir: /opt/passivedns
+
+- name: Build the passivedns target
+  make:
+    chdir: /opt/passivedns
+
+- name: Deploy the passivedns build using check install
+  shell:
+    cmd: checkinstall -D --pkgname=passivedns --default
+    chdir: /opt/passivedns
+
+# TODO: Compile/verify? lzmat
+
+- name: Setup resources folder for hosting volatility resources
+  file:
+    path: /usr/local/lib/python3/dist-packages/volatility/resources
+    state: directory
+
+- name: Create python __init__ file
+  file:
+    path: /usr/local/lib/python3/dist-packages/volatility/resources/__init__.py
+    state: touch
+
+- name: Download the lzmat source from git
+  git:
+    repo: https://github.com/nemequ/lzmat
+    dest: /usr/local/lib/python3/dist-packages/volatility/resources/lzmat
+    force: true
+
+- name: Build lzmat from source
+  shell:
+    cmd: gcc -Wall -fPIC -c lzmat_dec.c
+    chdir: /usr/local/lib/python3/dist-packages/volatility/resources/lzmat
+
+- name: Link and compile lzmat build
+  shell:
+    cmd: gcc -shared -Wl,-soname,lzmat_dec.so.1 -o lzmat_dec.so.1.0 lzmat_dec.o
+    chdir: /usr/local/lib/python3/dist-packages/volatility/resources/lzmat
+
+- name: Move the lzmat files to resource folder
+  shell:
+    cmd: mv /usr/local/lib/python3/dist-packages/volatility/resources/lzmat/* /usr/local/lib/python3/dist-packages/volatility/resources/
+
+- name: Remove lzmat build directory
+  file:
+    path: /usr/local/lib/python3/dist-packages/volatility/resources/lzmat
+    state: absent
+
+################
+# Unicorn-engine
+################
+
+- name: Install unicorn-engine dependencies
+  apt:
+    pkg:
+    - libglib2.0-dev
+    state: latest
+
+- name: Download the latest unicorn-engine source from git
+  git:
+    repo: https://github.com/unicorn-engine/unicorn.git
+    dest: /opt/unicorn
+    force: true
+
+- name: Build the unicorn-engine target
+  shell:
+    cmd: ./make.sh
+    chdir: /opt/unicorn
+
+- name: Install the unicorn-engine target
+  shell:
+    cmd: ./make.sh install
+    chdir: /opt/unicorn
+
+- name: Install unicorn python dependencies
+  pip:
+    name:
+    - unicorn
+    - Capstone
+    executable: pip3
+
+######
+# NTP
+######
+
+- name: Install ntp daemon
+  apt:
+    pkg:
+    - ntp
+    state: latest
+
+- name: Ensure ntp is started and enable the service to run on boot
+  systemd:
+    name: ntp
+    state: started
+    enabled: true
+
+- name: "Create group pcap"
+  group:
+    name: "pcap"
+    state: present
+
+- name: Ensure /usr/sbin/tcpdump is owned by pcap group
+  file:
+    path: /usr/sbin/tcpdump
+    group: pcap
+
+- name: Set capabilities for /usr/sbin/tcpdump
+  capabilities:
+    path: /usr/sbin/tcpdump
+    capability: "{{ item.value }}"
+    state: present
+  with_items:
+    - value: "cap_net_raw=eip"
+    - value: "cap_net_admin=eip"
+
+- name: Install apparmor-utils
+  apt:
+    pkg:
+    - apparmor-utils
+    state: latest

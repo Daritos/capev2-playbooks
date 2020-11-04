@@ -1,0 +1,32 @@
+- name: Get latest release tag from Yara repo
+  uri:
+    url: "https://api.github.com/repos/jemalloc/jemalloc/releases/latest"
+    return_content: true
+  register: jemalloc_latest
+
+- name: Download the jemalloc from git
+  git:
+    repo: https://github.com/jemalloc/jemalloc.git
+    dest: /opt/jemalloc
+    force: true
+    version: "{{ jemalloc_latest.json.tag_name }}"
+
+- name: Run jemalloc autogen
+  shell:
+    cmd: "./autogen.sh"
+    chdir: /opt/jemalloc
+
+- name: Build the jemalloc target
+  make:
+    chdir: /opt/jemalloc
+
+- name: Utilize checkinstall to deploy jemalloc as a package
+  shell:
+    cmd: "checkinstall -D --pkgname=\"jemalloc-{{ jemalloc_latest.json.tag_name  }}\" --pkgversion=\"{{ jemalloc_latest.json.tag_name  }}|cut -c 2-\" --default"
+    chdir: /opt/jemalloc
+
+- name: Create symbolic link for libjemalloc.so
+  file:
+    src: /usr/local/lib/libjemalloc.so
+    dest: /usr/lib/x86_64-linux-gnu/libjemalloc.so
+    state: link

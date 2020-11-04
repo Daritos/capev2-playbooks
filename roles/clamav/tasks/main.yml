@@ -1,0 +1,35 @@
+- name: Install clamav
+  apt:
+    pkg:
+    - clamav
+    - clamav-daemon
+    - clamav-freshclam
+    - clamav-unofficial-sigs
+    state: latest
+    update_cache: true
+
+- name: Install pyclamd
+  pip:
+    name:
+    - pyclamd
+    executable: pip3
+
+- name: Configure settings for the clamav-unofficial-sigs.sh
+  template:
+    src: 00-clamav-unofficial-sigs.conf.j2
+    dest: /usr/share/clamav-unofficial-sigs/conf.d/00-clamav-unofficial-sigs.conf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Ensure clamav-daemon is started and enable the service to run on boot
+  systemd:
+    name: clamav-daemon
+    state: restarted
+    enabled: true
+    daemon_reload: true
+
+- name: Run clamav-unofficial-sigs.sh
+  shell:
+    cmd: /usr/sbin/clamav-unofficial-sigs
+  become: clamav

@@ -1,0 +1,48 @@
+
+- name: Add Tor repo GPG Key
+  apt_key:
+    url: https://deb.torproject.org/torproject.org/A3C4F0F979CAA22CDBA8F512EE8CBC9E886DDD89.asc
+    state: present
+
+- name: Add Tor repo (deb)
+  apt_repository:
+    repo: "deb http://deb.torproject.org/torproject.org {{ ansible_distribution_release }} main"
+    state: present
+
+- name: Add Tor repo (deb-src)
+  apt_repository:
+    repo: "deb-src http://deb.torproject.org/torproject.org {{ ansible_distribution_release }} main"
+    state: present
+
+- name: Install Tor
+  apt:
+    pkg:
+    - tor
+    - deb.torproject.org-keyring
+    - libzstd1
+    update_cache: true
+
+- name: Configure Tor to run as daemon
+  lineinfile:
+    dest: /etc/tor/torrc
+    line: "RunAsDaemon 1"
+    regexp: "^#RunAsDaemon 1"
+
+- name: Configure Tor ports
+  lineinfile:
+    dest: /etc/tor/torrc
+    line: "{{ item.name }} {{ item.value }}"
+    regexp: "^{{ item.name }}"
+  with_items:
+    - name: "TransPort "
+      value: "{{ tor_listening_ip }}:9040"
+    - name: "DNSPort "
+      value: "{{ tor_listening_ip }}:5353"
+    - name: "NumCPUs "
+      value: "{{ ansible_processor_vcpus }}"
+
+- name: Make sure tor is started and enabled on boot
+  systemd:
+    name: tor
+    state: restarted
+    enabled: true

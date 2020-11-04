@@ -1,0 +1,315 @@
+- name: Fix typo in proxmox machinery module
+  lineinfile:
+    dest: /opt/CAPEv2/modules/machinery/proxmox.py
+    line: "from lib.cuckoo.common.config import Config"
+    regexp: "^from lib.cuckoo.common.config import"
+
+- name: Fix typo in proxmox machinery module for starting machines
+  lineinfile:
+    dest: /opt/CAPEv2/modules/machinery/proxmox.py
+    line: "    def start(self, label):"
+    regexp: "^    def start"
+
+- name: Pin agent ROOT directory
+  lineinfile:
+    dest: /opt/CAPEv2/analyzer/windows/lib/common/constants.py
+    line: "ROOT = os.path.join(os.getenv(\"SystemDrive\"), "\\\\", \"Logs\")"
+    regexp: "^ROOT ="
+
+###
+# VMShare
+###
+
+- name: Create vmshare directory
+  file:
+    path: /opt/vmshare
+    state: directory
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+###
+# Setup registry tweaks
+###
+
+- name: Create registry tweaks directory
+  file:
+    path: /opt/vmshare/regtweaks
+    state: directory
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Copy curtain.bat to VMShare Registry Tweaks path
+  copy:
+    src: curtain.bat
+    dest: /opt/vmshare/regtweaks/curtain.bat
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+# Based on SeanTheGeek's reg files found in his post here
+# https://infosecspeakeasy.org/t/howto-build-a-cuckoo-sandbox/27
+
+- name: Copy Office2010.reg to VMShare Registry Tweaks path
+  copy:
+    src: Office2010.reg
+    dest: /opt/vmshare/regtweaks/Office2010.reg
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Copy Office2013.reg to VMShare Registry Tweaks path
+  copy:
+    src: Office2013.reg
+    dest: /opt/vmshare/regtweaks/Office2013.reg
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Copy Office2016-2019.reg to VMShare Registry Tweaks path
+  copy:
+    src: Office2016-2019.reg
+    dest: /opt/vmshare/regtweaks/Office2016-2019.reg
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Copy Zombieswin7-10.reg to VMShare Registry Tweaks path
+  copy:
+    src: Zombieswin7-10.reg
+    dest: /opt/vmshare/regtweaks/Zombieswin7-10.reg
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Copy ZombiesXP.reg to VMShare Registry Tweaks path
+  copy:
+    src: ZombiesXP.reg
+    dest: /opt/vmshare/regtweaks/ZombiesXP.reg
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+####
+####
+
+- name: Copy VM agent script to VMShare path
+  copy:
+    src: /opt/CAPEv2/agent/agent.py
+    dest: /opt/vmshare/agent.pyw
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+    remote_src: true
+
+- name: Setup curtain dependency download directory
+  file:
+    path: /opt/vmshare/curtain
+    state: directory
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve curtain dependencies
+  get_url:
+    url: "{{ item.url }}"
+    dest: "/opt/vmshare/curtain/{{ item.name }}"
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+  with_items:
+    - url: "https://cuckoo.sh/vmcloak/Windows6.1-KB3109118-v4-x64.msu"
+      name: "Windows6.1-KB3109118-v4-x64.msu"
+    - url: "https://cuckoo.sh/vmcloak/Windows6.1-KB3109118-v4-x86.msu"
+      name: "Windows6.1-KB3109118-v4-x86.msu"
+    - url: "https://cuckoo.sh/vmcloak/Windows6.1-KB2819745-x64-MultiPkg.msu"
+      name: "Windows6.1-KB2819745-x64-MultiPkg.msu"
+    - url: "https://cuckoo.sh/vmcloak/Windows6.1-KB2819745-x86-MultiPkg.msu"
+      name: "Windows6.1-KB2819745-x86-MultiPkg.msu"
+    - url: "https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/Win7-KB3191566-x86.zip"
+      name: "Win7-KB3191566-x86.zip"
+    - url: "https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/W2K12-KB3191565-x64.msu"
+      name: "W2K12-KB3191565-x64.msu"
+    - url: "https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/Win8.1-KB3191564-x86.msu"
+      name: "Win8.1-KB3191564-x86.msu"
+    - url: "https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/Win7AndW2K8R2-KB3191566-x64.zip"
+      name: "Win7AndW2K8R2-KB3191566-x64.zip"
+    - url: "https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/Win8.1AndW2K12R2-KB3191564-x64.msu"
+      name: "Win8.1AndW2K12R2-KB3191564-x64.msu"
+
+- name: Setup windows 7 dependencies download directory
+  file:
+    path: /opt/vmshare/win7dep
+    state: directory
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve windows 7 dependencies
+  get_url:
+    url: "{{ item.url }}"
+    dest: "/opt/vmshare/win7dep/{{ item.name }}"
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+  with_items:
+    - url: "https://download.microsoft.com/download/0/A/F/0AFB5316-3062-494A-AB78-7FB0D4461357/windows6.1-KB976932-X64.exe"
+      name: "windows6.1-KB976932-X64.exe"
+    - url: "https://download.microsoft.com/download/F/1/0/F106E158-89A1-41E3-A9B5-32FEB2A99A0B/Windows6.1-KB2533623-x64.msu"
+      name: "Windows6.1-KB2533623-x64.msu"
+
+- name: Setup sysmon download directory
+  file:
+    path: /opt/vmshare/sysmon
+    state: directory
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve latest version of sysmon
+  get_url:
+    url: https://download.sysinternals.com/files/Sysmon.zip
+    dest: /opt/vmshare/sysmon/Sysmon.zip
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve latest version of SwiftOnSecurity sysmon config
+  get_url:
+    url: https://raw.githubusercontent.com/SwiftOnSecurity/sysmon-config/master/sysmonconfig-export.xml
+    dest: /opt/vmshare/sysmon/sysmonconfig-export.xml
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Setup generic application folder for vmshare
+  file:
+    path: /opt/vmshare/apps
+    state: directory
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve 7zip 32-bit offline installer
+  get_url:
+    url: https://www.7-zip.org/a/7z1900.exe
+    dest: /opt/vmshare/apps/7z1900-x86.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve 7zip 64-bit offline installer
+  get_url:
+    url: https://www.7-zip.org/a/7z1900-x64.exe
+    dest: /opt/vmshare/apps/7z1900-x64.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve Adobe Reader offline installer
+  get_url:
+    url: https://admdownload.adobe.com/bin/live/readerdc_en_xa_install.exe
+    dest: /opt/vmshare/apps/readerdc_en_xa_install.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve Flash Player (firefox) offline installer
+  get_url:
+    url: https://admdownload.adobe.com/bin/live/flashplayer32_xa_install.exe
+    dest: /opt/vmshare/apps/Firefox-flashplayer32_xa_install.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve Flash Player (chrome) offline installer
+  get_url:
+    url: https://admdownload.adobe.com/bin/live/flashplayer32pp_xa_install.exe
+    dest: /opt/vmshare/apps/Chrome-flashplayer32pp_xa_install.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve Flash Player (ie) offline installer
+  get_url:
+    url: https://admdownload.adobe.com/bin/live/flashplayer32ax_xa_install.exe
+    dest: /opt/vmshare/apps/IE-flashplayer32ax_xa_install.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve Firefox (32bit) offline installer
+  get_url:
+    url: https://download.mozilla.org/?product=firefox-latest-ssl&os=win&lang=en-US
+    dest: /opt/vmshare/apps/firefox_32bit.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve Firefox (64bit) offline installer
+  get_url:
+    url: https://download.mozilla.org/?product=firefox-latest-ssl&os=win64&lang=en-US
+    dest: /opt/vmshare/apps/firefox_64bit.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve Chrome offline installer
+  get_url:
+    url: https://dl.google.com/chrome/install/latest/chrome_installer.exe
+    dest: /opt/vmshare/apps/chrome_installer.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve Notepad++ 32-bit installer
+  get_url:
+    url: https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v7.8.3/npp.7.8.3.Installer.exe
+    dest: /opt/vmshare/apps/npp.7.8.3.Installer.x86.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve Notepad++ 64-bit installer
+  get_url:
+    url: https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v7.8.3/npp.7.8.3.Installer.x64.exe
+    dest: /opt/vmshare/apps/npp.7.8.3.Installer.x64.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve Python 3.8.0 64-bit offline installer
+  get_url:
+    url: https://www.python.org/ftp/python/3.8.0/python-3.8.0-amd64.exe
+    dest: /opt/vmshare/apps/python-3.8.0-amd64.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve Python 3.8.0 32-bit offline installer
+  get_url:
+    url: https://www.python.org/ftp/python/3.8.0/python-3.8.0.exe
+    dest: /opt/vmshare/apps/python-3.8.0-32bit.exe
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Setup Elastic Beats folder for vmshare
+  file:
+    path: /opt/vmshare/apps/beats
+    state: directory
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
+- name: Retrieve Elastic Beats and dependencies
+  get_url:
+    url: "{{ item.url }}"
+    dest: "/opt/vmshare/apps/beats/{{ item.name }}"
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+  with_items:
+    - url: "https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{elastic_version}}-windows-x86_64.zip"
+      name: "filebeat-{{elastic_version}}-windows-x86_64.zip"
+    - url: "https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{elastic_version}}-windows-x86_64.zip"
+      name: "packetbeat-{{elastic_version}}-windows-x86_64.zip"
+    - url: "https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-{{elastic_version}}-windows-x86_64.zip"
+      name: "winlogbeat-{{elastic_version}}-windows-x86_64.zip"
+    - url: "https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{elastic_version}}-windows-x86_64.zip"
+      name: "auditbeat-{{elastic_version}}-windows-x86_64.zip"
+    - url: "https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-{{elastic_version}}-windows-x86.zip"
+      name: "filebeat-{{elastic_version}}-windows-x86.zip"
+    - url: "https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-{{elastic_version}}-windows-x86.zip"
+      name: "packetbeat-{{elastic_version}}-windows-x86.zip"
+    - url: "https://artifacts.elastic.co/downloads/beats/winlogbeat/winlogbeat-{{elastic_version}}-windows-x86.zip"
+      name: "winlogbeat-{{elastic_version}}-windows-x86.zip"
+    - url: "https://artifacts.elastic.co/downloads/beats/auditbeat/auditbeat-{{elastic_version}}-windows-x86.zip"
+      name: "auditbeat-{{elastic_version}}-windows-x86.zip"
+    - url: "https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{{elastic_version}}-windows-x86_64.zip"
+      name: "elastic-agent-{{elastic_version}}-windows-x86_64.zip"
+    - url: "https://nmap.org/npcap/dist/npcap-{{npcap_version}}.exe"
+      name: "npcap-{{npcap_version}}.exe"
+
+- name: "Remove previous vmshare archive"
+  file:
+    path: /opt/vmshare/all.zip
+    state: absent
+
+- name: "Generate new archive of vmshare"
+  archive:
+    path: /opt/vmshare
+    dest: /tmp/all.zip
+    format: zip
+
+- name: "Move new archive into vmshare folder"
+  shell: mv /tmp/all.zip /opt/vmshare/all.zip

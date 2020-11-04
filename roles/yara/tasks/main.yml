@@ -1,0 +1,55 @@
+
+- name: Remove old/existing YARA versions
+  shell: 'dpkg -l|grep "yara-v[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}"|cut -d " " -f 3|sudo xargs dpkg --purge --force-all'
+
+- name: Install Yara dependencies
+  apt:
+    pkg:
+    - libtool
+    - libjansson-dev
+    - libmagic1
+    - libmagic-dev
+    - jq
+    - autoconf
+    - checkinstall
+
+- name: Get latest release tag from Yara repo
+  uri:
+    url: "https://api.github.com/repos/VirusTotal/yara/releases/latest"
+    return_content: true
+  register: yara_latest
+
+- name: Download the Yara from git
+  git:
+    repo: https://github.com/VirusTotal/yara.git
+    dest: /opt/yara
+    force: true
+    version: "{{ yara_latest.json.tag_name }}"
+
+- name: Run Yara bootstrap
+  shell:
+    cmd: "./bootstrap.sh"
+    chdir: /opt/yara
+
+- name: Run Yara configure
+  shell:
+    cmd: "./configure --enable-cuckoo --enable-magic --enable-dotnet --enable-profiling"
+    chdir: /opt/yara
+
+- name: Build the Yara target
+  make:
+    chdir: /opt/yara
+
+- name: Utilize checkinstall to deploy yara as a package
+  shell:
+    cmd: "checkinstall -D --pkgname=\"yara-{{ yara_latest.json.tag_name }}\" --pkgversion=\"{{ yara_latest.json.tag_name }}|cut -c 2-\" --default"
+    chdir: /opt/yara
+
+- name: Run ldconfig
+  shell:
+    cmd: ldconfig
+
+- name: Globaly install yara-python from git
+  pip:
+    name: git+https://github.com/VirusTotal/yara-python
+    executable: pip3

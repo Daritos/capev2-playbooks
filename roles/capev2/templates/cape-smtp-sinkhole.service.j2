@@ -1,11 +1,12 @@
 [Unit]
-Description=Cuckoo socksproxies
+Description=CAPE smtp sinkhole
 Documentation=https://github.com/kevoreilly/CAPEv2
 Wants=network-online.target
 After=syslog.target network.target
 
 [Service]
-ExecStart=/opt/CAPEv2/socksproxies.sh
+WorkingDirectory=/opt/CAPEv2/utils/
+ExecStart=/opt/CAPEv2/utils/smtp_sinkhole.sh
 User=root
 Group=root
 Restart=always

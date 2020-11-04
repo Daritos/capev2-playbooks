@@ -1,0 +1,27 @@
+- name: Install redsock2 dependencies
+  apt:
+    pkg:
+    - libevent-dev
+    - libreadline-dev
+    - zlib1g-dev
+    - libncurses5-dev
+    - libssl-dev
+    state: latest
+
+- name: Download the latest redsocks2 source from git
+  git:
+    repo: https://github.com/semigodking/redsocks
+    dest: /opt/redsocks2
+    force: true
+
+- name: Build the redsocks2 target
+  make:
+    chdir: /opt/redsocks2
+    params:
+      DISABLE_SHADOWSOCKS: "true"
+
+- name: Copy built redsocks2 bin to /usr/bin/redsocks2
+  copy:
+    src: /opt/redsocks2/redsocks2
+    dest: /usr/bin/redsocks2
+    remote_src: true

@@ -1,0 +1,16 @@
+- name: Install fail2ban
+  apt:
+    pkg:
+    - fail2ban
+    state: latest
+
+- name: Apply jail configuration
+  template:
+    src: jail.local.j2
+    dest: /etc/fail2ban/jail.local
+
+- name: Make sure fail2ban is started and enabled on boot
+  systemd:
+    name: fail2ban
+    state: restarted
+    enabled: true

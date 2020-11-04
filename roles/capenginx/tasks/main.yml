@@ -1,0 +1,64 @@
+- name: Setup /etc/ssl/cape directory
+  file:
+    path: /etc/ssl/cape
+    state: directory
+
+- name: Generate Diffie-Hellman parameters with the default size (4096 bits)
+  openssl_dhparam:
+    path: /etc/ssl/cape/dhparams.pem
+
+- name: Generate an OpenSSL private key with the default values (4096 bits, RSA)
+  openssl_privatekey:
+    path: /etc/ssl/cape/cape.key
+
+- name: Generate an OpenSSL Certificate Signing Request
+  openssl_csr:
+    path: /etc/ssl/cape/cape.csr
+    privatekey_path: /etc/ssl/cape/cape.key
+    common_name: "{{ cert_common_name }}"
+
+- name: Generate a Self Signed OpenSSL certificate
+  openssl_certificate:
+    path: /etc/ssl/cape/cape.crt
+    privatekey_path: /etc/ssl/cape/cape.key
+    csr_path: /etc/ssl/cape/cape.csr
+    provider: selfsigned
+
+- name: Install nginx
+  apt:
+    name: nginx
+    state: latest
+
+- name: Remove default site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: Copy and enable the cape nginx config file
+  template:
+    src: cape.conf.j2
+    dest: /etc/nginx/sites-available/cape.conf
+
+- name: Enable cape nginx config
+  file:
+    src: /etc/nginx/sites-available/cape.conf
+    dest: /etc/nginx/sites-enabled/cape.conf
+    state: link
+
+- name: Copy and enable the vmshare nginx config file
+  template:
+    src: vmshare.conf.j2
+    dest: /etc/nginx/sites-available/vmshare.conf
+
+- name: Enable cape vmshare config
+  file:
+    src: /etc/nginx/sites-available/vmshare.conf
+    dest: /etc/nginx/sites-enabled/vmshare.conf
+    state: link
+
+- name: Restart nginx and enable the service to run on boot
+  systemd:
+    name: nginx
+    state: restarted
+    enabled: true
+    daemon_reload: true

@@ -1,0 +1,32 @@
+
+- name: Add Postgresql GPG Key
+  apt_key:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    state: present
+
+- name: Add PostgreSQL repo
+  apt_repository:
+    repo: "deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_distribution_release }}-pgdg main"
+    state: present
+
+- name: Install postgresql
+  apt:
+    pkg:
+    - postgresql
+    - postgresql-client
+    - postgresql-contrib
+    - libpq-dev
+    state: latest
+    update_cache: true
+
+- name: Make sure postgresql is started and enabled on boot
+  systemd:
+    name: postgresql
+    state: started
+    enabled: true
+
+- name: Make sure python package psycopg2 is present
+  pip:
+    name: psycopg2
+    state: present
+    executable: pip3
