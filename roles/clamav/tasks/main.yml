@@ -22,14 +22,41 @@
     group: root
     mode: 0644
 
-- name: Ensure clamav-daemon is started and enable the service to run on boot
+- name: Temporary stop clamav-freshclam
+  systemd:
+    name: clamav-freshclam
+    state: stopped
+    daemon_reload: true
+
+- name: Temporary stop clamav-daemon
   systemd:
     name: clamav-daemon
-    state: restarted
+    state: stopped
+    daemon_reload: true
+
+- name: Manually run freshclam once
+  shell:
+    cmd: freshclam
+    creates: /var/lib/clamav/daily.cld
+
+- name: Start clamav-freshclam is enable the service to run on boot
+  systemd:
+    name: clamav-freshclam
+    state: started
+    enabled: true
+    daemon_reload: true
+
+- name: Start clamav-daemon is enable the service to run on boot
+  systemd:
+    name: clamav-daemon
+    state: started
     enabled: true
     daemon_reload: true
 
 - name: Run clamav-unofficial-sigs.sh
   shell:
     cmd: /usr/sbin/clamav-unofficial-sigs
-  become: clamav
+  become: true
+  become_user: clamav
+  tags:
+  - clamav-unofficial-sigs

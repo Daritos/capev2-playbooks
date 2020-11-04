@@ -16,6 +16,13 @@
     line: 'ROOT = os.path.join(os.getenv("SystemDrive"), "\\", "Logs")'
     regexp: '^ROOT ='
 
+- name: Patch CAPE web settings
+  template:
+    src: "cape.web.settings.py.j2"
+    dest: "/opt/CAPEv2/web/web/settings.py"
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
+
 ###
 # VMShare
 ###
@@ -108,14 +115,15 @@
     owner: "{{ cape_user }}"
     group: "{{ cape_user }}"
   with_items:
-    - url: "https://cuckoo.sh/vmcloak/Windows6.1-KB3109118-v4-x64.msu"
-      name: "Windows6.1-KB3109118-v4-x64.msu"
-    - url: "https://cuckoo.sh/vmcloak/Windows6.1-KB3109118-v4-x86.msu"
-      name: "Windows6.1-KB3109118-v4-x86.msu"
-    - url: "https://cuckoo.sh/vmcloak/Windows6.1-KB2819745-x64-MultiPkg.msu"
-      name: "Windows6.1-KB2819745-x64-MultiPkg.msu"
-    - url: "https://cuckoo.sh/vmcloak/Windows6.1-KB2819745-x86-MultiPkg.msu"
-      name: "Windows6.1-KB2819745-x86-MultiPkg.msu"
+# Need to lookup replacement
+#    - url: "https://cuckoo.sh/vmcloak/Windows6.1-KB3109118-v4-x64.msu"
+#      name: "Windows6.1-KB3109118-v4-x64.msu"
+#    - url: "https://cuckoo.sh/vmcloak/Windows6.1-KB3109118-v4-x86.msu"
+#      name: "Windows6.1-KB3109118-v4-x86.msu"
+#    - url: "https://cuckoo.sh/vmcloak/Windows6.1-KB2819745-x64-MultiPkg.msu"
+#      name: "Windows6.1-KB2819745-x64-MultiPkg.msu"
+#    - url: "https://cuckoo.sh/vmcloak/Windows6.1-KB2819745-x86-MultiPkg.msu"
+#      name: "Windows6.1-KB2819745-x86-MultiPkg.msu"
     - url: "https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/Win7-KB3191566-x86.zip"
       name: "Win7-KB3191566-x86.zip"
     - url: "https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/W2K12-KB3191565-x64.msu"
@@ -134,17 +142,18 @@
     owner: "{{ cape_user }}"
     group: "{{ cape_user }}"
 
-- name: Retrieve windows 7 dependencies
-  get_url:
-    url: "{{ item.url }}"
-    dest: "/opt/vmshare/win7dep/{{ item.name }}"
-    owner: "{{ cape_user }}"
-    group: "{{ cape_user }}"
-  with_items:
-    - url: "https://download.microsoft.com/download/0/A/F/0AFB5316-3062-494A-AB78-7FB0D4461357/windows6.1-KB976932-X64.exe"
-      name: "windows6.1-KB976932-X64.exe"
-    - url: "https://download.microsoft.com/download/F/1/0/F106E158-89A1-41E3-A9B5-32FEB2A99A0B/Windows6.1-KB2533623-x64.msu"
-      name: "Windows6.1-KB2533623-x64.msu"
+# Need to lookup replacement KBs
+#- name: Retrieve windows 7 dependencies
+#  get_url:
+#    url: "{{ item.url }}"
+#    dest: "/opt/vmshare/win7dep/{{ item.name }}"
+#    owner: "{{ cape_user }}"
+#    group: "{{ cape_user }}"
+#  with_items:
+#    - url: "https://download.microsoft.com/download/0/A/F/0AFB5316-3062-494A-AB78-7FB0D4461357/windows6.1-KB976932-X64.exe"
+#      name: "windows6.1-KB976932-X64.exe"
+#    - url: "https://download.microsoft.com/download/F/1/0/F106E158-89A1-41E3-A9B5-32FEB2A99A0B/Windows6.1-KB2533623-x64.msu"
+#      name: "Windows6.1-KB2533623-x64.msu"
 
 - name: Setup sysmon download directory
   file:
@@ -313,3 +322,41 @@
 
 - name: "Move new archive into vmshare folder"
   shell: mv /tmp/all.zip /opt/vmshare/all.zip
+
+###
+# Restart CAPE Services
+###
+- name: Restart cape-rooter and enable the service to run on boot
+  systemd:
+    name: cape-rooter
+    state: restarted
+    enabled: true
+    daemon_reload: true
+
+- name: Restart cape-socks5man and enable the service to run on boot
+  systemd:
+    name: cape-socks5man
+    state: restarted
+    enabled: true
+    daemon_reload: true
+
+- name: Restart cape and enable the service to run on boot
+  systemd:
+    name: cape
+    state: restarted
+    enabled: true
+    daemon_reload: true
+
+- name: Restart cape-processor and enable the service to run on boot
+  systemd:
+    name: cape-processor
+    state: restarted
+    enabled: true
+    daemon_reload: true
+
+- name: Restart cape-wsgi and enable the service to run on boot
+  systemd:
+    name: cape-wsgi
+    state: restarted
+    enabled: true
+    daemon_reload: true

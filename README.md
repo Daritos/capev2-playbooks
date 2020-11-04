@@ -52,6 +52,8 @@ Insert the following and adjust according to your needs
         },
         "vars" : {
             "ansible_python_interpreter": "/usr/bin/python3",
+            "elastic_version": "7.9.3",
+            "npcap_version": "1.00",
             "cape_user": "cape",
             "cape_db_user": "cape",
             "cape_db_password": "changeme",
@@ -102,5 +104,5 @@ Insert the following and adjust according to your needs
 Launch the playbook
 
 ```bash
-ansible-playbook --connection=local --inventory 127.0.0.1 --limit 127.0.0.1 capev2_deploy.yml -i inventory
+ansible-playbook --connection=local --inventory inventory --limit 127.0.0.1 capev2_deploy.yml
 ```

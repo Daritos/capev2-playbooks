@@ -1,0 +1,112 @@
+
+- name: Add suricata deb repo
+  apt_repository:
+    repo: "ppa:oisf/suricata-stable"
+    filename: suricata_stable
+    state: present
+
+- name: Install suricata
+  apt:
+    pkg:
+    - suricata
+    state: latest
+
+- name: "Create group suricata"
+  group:
+    name: "suricata"
+    state: present
+
+- name: Create /etc/suricata/threshold.config
+  file:
+    path: /etc/suricata/threshold.config
+    state: touch
+
+- name: Install python package for updating suricata rules
+  pip:
+    name:
+    - suricata-update
+    executable: pip3
+
+- name: Setup directory for hosting rules
+  file:
+    path: /etc/suricata/rules
+    state: directory
+    recurse: true
+
+- name: Adjust suricata configuration /etc/default/suricata
+  lineinfile:
+    dest: /etc/default/suricata
+    line: "{{ item.value }}"
+    regexp: "^{{ item.name }}"
+  with_items:
+    - name: "RUN="
+      value: "RUN=no"
+    - name: "default-rule-path: /var/lib/suricata/rules"
+      value: "default-rule-path: /etc/suricata/rules"
+
+- name: Deploy /etc/suricata/suricata.yaml
+  template:
+    src: suricata.yaml.j2
+    dest: /etc/suricata/suricata.yaml
+
+- name: Set ownership of /etc/suricata
+  file:
+    path: /etc/suricata
+    state: directory
+    group: "{{ cape_user }}"
+    owner: "{{ cape_user }}"
+    recurse: true
+
+- name: Set ownership of /var/log/suricata
+  file:
+    path: /var/log/suricata
+    state: directory
+    group: "suricata"
+    owner: "{{ cape_user }}"
+    recurse: true
+
+- name: Set permissions for /var/run/suricata
+  file:
+    path: /var/run/suricata
+    state: directory
+    group: suricata
+    owner: "{{ cape_user }}"
+#    mode: 0775
+
+- name: Set permissions for /var/lib/suricata
+  file:
+    path: /var/lib/suricata
+    state: directory
+    group: suricata
+    owner: "{{ cape_user }}"
+    recurse: true
+#    mode: 0665
+
+- name: Run suricata rule update manually once
+  shell:
+    cmd: "/usr/bin/suricata-update --suricata /usr/bin/suricata --suricata-conf /etc/suricata/suricata.yaml -o /etc/suricata/rules/"
+    creates: /etc/suricata/rules/suricata.rules
+
+- name: Create cronjob for updating rules
+  cron:
+    name: update suricata rules
+    minute: "15"
+    hour: "*"
+    day: "*"
+    month: "*"
+    weekday: "*"
+    user: root
+    job: "/usr/bin/suricata-update --suricata /usr/bin/suricata --suricata-conf /etc/suricata/suricata.yaml -o /etc/suricata/rules/ --no-test && /usr/bin/suricatasc -c reload-rules /tmp/suricata-command.socket &>/dev/null"
+    cron_file: ansible_suricata_rules_autoupdate
+
+- name: Setup cape-suricata.service unit file
+  template:
+    src: cape-suricata.service.j2
+    dest: /etc/systemd/system/cape-suricata.service
+
+- name: Restart cape-suricata and enable the service to run on boot
+  systemd:
+    name: cape-suricata
+    state: restarted
+    enabled: true
+    daemon_reload: true

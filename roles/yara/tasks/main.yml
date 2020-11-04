@@ -1,6 +1,7 @@
 
 - name: Remove old/existing YARA versions
-  shell: 'dpkg -l|grep "yara-v[0-9]\{1,2\}\.[0-9]\{1,2\}\.[0-9]\{1,2\}"|cut -d " " -f 3|sudo xargs dpkg --purge --force-all'
+  shell: 'dpkg -l|grep "yara-v"|cut -d " " -f 3| xargs dpkg --purge --force-all'
+  ignore_errors: true
 
 - name: Install Yara dependencies
   apt:

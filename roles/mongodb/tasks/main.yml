@@ -4,23 +4,19 @@
     - libpcre3-dev
     state: latest
 
-- name: Install MongoDB 4.2 GPG-KEY
+- name: Install MongoDB 4.4 GPG-KEY
   apt_key:
-    url:  https://www.mongodb.org/static/pgp/server-4.2.asc
+    url:  https://www.mongodb.org/static/pgp/server-4.4.asc
     state: present
 
-- name: Add MongoDB 4.2 repo
+- name: Add MongoDB 4.4 repo
   apt_repository:
-    repo: "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu {{ ansible_distribution_release }}/mongodb-org/4.2 multiverse"
+    repo: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu {{ ansible_distribution_release }}/mongodb-org/4.4 multiverse"
 
 - name: Install MongoDB
   apt:
     pkg:
     - mongodb-org
-    - mongodb-org-mongos
-    - mongodb-org-server
-    - mongodb-org-shell
-    - mongodb-org-tools
     state: latest
     update_cache: true
 

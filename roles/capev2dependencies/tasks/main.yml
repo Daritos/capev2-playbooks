@@ -155,6 +155,7 @@
     - flask-restful
     - flask-sqlalchemy
     - pyvmomi
+    - proxmoxer
     executable: pip3
 
 
@@ -304,3 +305,35 @@
     pkg:
     - apparmor-utils
     state: latest
+
+###
+# Setup Users and groups
+###
+
+- name: "Create group {{ cape_user }}"
+  group:
+    name: "{{ cape_user }}"
+    state: present
+
+- name: "Create group suricata"
+  group:
+    name: "suricata"
+    state: present
+
+- name: "Create group pcap"
+  group:
+    name: "pcap"
+    state: present
+
+- name: "Create group clamav"
+  group:
+    name: "clamav"
+    state: present
+
+- name: "Add user {{ cape_user }}"
+  user:
+    name: "{{ cape_user }}"
+    groups: "{{ cape_user }},pcap,suricata,clamav"
+    append: yes
+    comment: "{{ cape_user }} nologin User"
+    state: present

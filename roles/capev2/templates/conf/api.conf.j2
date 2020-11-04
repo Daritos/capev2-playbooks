@@ -4,6 +4,19 @@ ratelimit = yes
 # IP/Domain to be used for help page + callback URL's
 url = https://{{ external_fqdn }}
 
+users_db = /etc/nginx/.htpasswd
+
+# Download any file from CAPE webgui
+[download_file]
+enabled = yes
+rps = 1/s
+rpm = 5/m
+
+[filereport]
+enabled = yes
+rps = 1/s
+rpm = 5/m
+
 # Submit Download & execute - category tasks to Cuckoo.
 [dlnexeccreate]
 enabled = no
@@ -12,14 +25,17 @@ status = yes
 rps = 2/s
 rpm = 2/m
 
+[staticextraction]
+enabled = yes
+rps = 5/s
+rpm = 5/m
+
+
 # Submit file-category tasks to Cuckoo.
 [filecreate]
 enabled = yes
 # Allow machines=all option which will submit the file to all virtuals.
 allmachines = no
-# File size for upload limit in MB
-# If this is commented, default is 5 MB
-upload_limit = 10
 # Accept multiple files submitted at the same time
 # If set to 'no' we only accept the first file
 multifile = no
@@ -228,5 +244,17 @@ rpm = 4/m
 # Configure the ability to download CAPE payload files.
 [payloadfiles]
 enabled = yes
+rps = 1/s
+rpm = 4/m
+
+# Get ids of last X hours
+[tasks_latest]
+enabled = no
+rps = 1/s
+rpm = 4/m
+
+# Get summary of tasks per hours for last 24h
+[task_x_hours]
+enabled = no
 rps = 1/s
 rpm = 4/m

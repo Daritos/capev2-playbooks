@@ -9,7 +9,10 @@
     state: present
 
 - name: Set en_US.UTF-8 as default locale
-  command: localectl set-locale LANGUAGE=en_US.UTF-8 LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+  command: localectl set-locale LANGUAGE=en_US.UTF-8 LANG=en_US.UTF-8
+
+- name: Set en_US.UTF-8 as default locale
+  command: update-locale LC_ALL=en_US.UTF-8
 
 ###
 # Setup Postgresql Database
@@ -45,23 +48,6 @@
   lineinfile:
     dest: /etc/apparmor.d/local/usr.sbin.clamd
     line: "/opt/CAPEv2/storage/** r,"
-
-###
-# Setup Users and groups
-###
-
-- name: "Create group {{ cape_user }}"
-  group:
-    name: "{{ cape_user }}"
-    state: present
-
-- name: "Add user {{ cape_user }}"
-  user:
-    name: "{{ cape_user }}"
-    groups: "{{ cape_user }},pcap,suricata,clamav"
-    append: yes
-    comment: "{{ cape_user }} nologin User"
-    state: present
 
 ###
 # Configure System Limits
@@ -187,6 +173,18 @@
 # Setup services
 ###
 
+- name: Setup cape-rooter.service unit file
+  template:
+    src: cape-rooter.service.j2
+    dest: /etc/systemd/system/cape-rooter.service
+
+- name: Restart cape-rooter and enable the service to run on boot
+  systemd:
+    name: cape-rooter
+    state: restarted
+    enabled: true
+    daemon_reload: true
+
 - name: Setup cape-socksproxies.service unit file
   template:
     src: cape-socksproxies.service.j2
@@ -207,30 +205,6 @@
 - name: Restart cape-smtp-sinkhole and enable the service to run on boot
   systemd:
     name: cape-smtp-sinkhole
-    state: restarted
-    enabled: true
-    daemon_reload: true
-
-- name: Setup cape-rooter.service unit file
-  template:
-    src: cape-rooter.service.j2
-    dest: /etc/systemd/system/cape-rooter.service
-
-- name: Restart cape-rooter and enable the service to run on boot
-  systemd:
-    name: cape-rooter
-    state: restarted
-    enabled: true
-    daemon_reload: true
-
-- name: Setup cape-suricata.service unit file
-  template:
-    src: cape-suricata.service.j2
-    dest: /etc/systemd/system/cape-suricata.service
-
-- name: Restart cape-suricata and enable the service to run on boot
-  systemd:
-    name: cape-suricata
     state: restarted
     enabled: true
     daemon_reload: true
