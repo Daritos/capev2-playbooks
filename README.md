@@ -84,13 +84,15 @@ Insert the following and adjust according to your needs
             "proxmox_user": "REPLACE_ME",
             "proxmox_password": "REPLACE_ME",
             "proxmox_active_vms": "win7",
-            "proxmox_vms": {
-                "name": "win7",
-                "platform": "windows",
-                "ip": "192.168.100.10",
-                "snapshot": "clean",
-                "tags": "64x"
-            }
+            "proxmox_vms": [
+                {
+                    "name": "win7",
+                    "platform": "windows",
+                    "ip": "192.168.100.10",
+                    "snapshot": "clean",
+                    "tags": "64x"
+                }
+            ]
         }
     }
 }
