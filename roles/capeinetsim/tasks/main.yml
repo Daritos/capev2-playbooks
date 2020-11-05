@@ -1,0 +1,22 @@
+- name: Add key of www.inetsim.org with apt-key
+  apt_key:
+    url: "http://www.inetsim.org/inetsim-archive-signing-key.asc"
+    state: present
+
+- name: Add inetsim repo to sourcelist
+  apt_repository:
+    repo: deb http://www.inetsim.org/debian/ binary/
+    filename: 'inetsim'
+    update_cache: yes
+
+- name: Install inetsim package
+  apt:
+    name: inetsim
+    state: latest
+
+- name: Restart inetsim and enable the service to run on boot
+  systemd:
+    name: inetsim
+    state: started
+    enabled: true
+    daemon_reload: true

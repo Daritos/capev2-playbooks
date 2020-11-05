@@ -49,6 +49,11 @@
     dest: /etc/apparmor.d/local/usr.sbin.clamd
     line: "/opt/CAPEv2/storage/** r,"
 
+- name: Restart Apparmor
+  systemd:
+    name: apparmor
+    state: restarted
+
 ###
 # Configure System Limits
 ###
@@ -260,14 +265,18 @@
 #    daemon_reload: true
 
 - name: Setup smtp_sinkhole.sh
-  template:
-    src: smtp_sinkhole.sh.j2
+  copy:
+    src: smtp_sinkhole.sh
     dest: /opt/CAPEv2/utils/smtp_sinkhole.sh
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
 
 - name: Setup smtp_sinkhole.py
-  template:
-    src: smtp_sinkhole.py.j2
+  copy:
+    src: smtp_sinkhole.py
     dest: /opt/CAPEv2/utils/smtp_sinkhole.py
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
 
 - name: Setup cape-smtp-sinkhole.service unit file
   template:

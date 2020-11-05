@@ -14,31 +14,36 @@
     name: nodejs
     state: latest
 
-- name: Install "hapi" node.js package globally.
-  npm:
-    name: hapi
-
-- name: Install "rimraf" node.js package globally.
-  npm:
-    name: rimraf
-
-- name: Install "express" node.js package globally.
-  npm:
-    name: express
-
-- name: Install "express-fileupload" node.js package globally.
-  npm:
-    name: express-fileupload
-
-- name: Install "body-parser" node.js package globally.
-  npm:
-    name: body-parser
-
 - name: Download the latest box-js source from git
   git:
     repo: https://github.com/CapacitorSet/box-js.git
     dest: /opt/box-js
     force: true
+
+- name: Install "hapi" node.js package globally.
+  npm:
+    name: hapi
+    path: /opt/box-js
+
+- name: Install "rimraf" node.js package globally.
+  npm:
+    name: rimraf
+    path: /opt/box-js
+
+- name: Install "express" node.js package globally.
+  npm:
+    name: express
+    path: /opt/box-js
+
+- name: Install "express-fileupload" node.js package globally.
+  npm:
+    name: express-fileupload
+    path: /opt/box-js
+
+- name: Install "body-parser" node.js package globally.
+  npm:
+    name: body-parser
+    path: /opt/box-js
 
 - name: Setup box-js-api.service unit file
   template:

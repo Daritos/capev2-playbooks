@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/sh
 # Add "@reboot /opt/cuckoo-modified/utils/smtp_sinkhole.sh" to the root crontab.
 # smtp
 sudo iptables -t nat -A PREROUTING -i virbr0 -p tcp -m tcp --dport 25 -j REDIRECT --to-ports 1025

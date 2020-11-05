@@ -12,7 +12,7 @@ cape_inetsim_interface: "virbr1"
 
 external_fqdn: "localhost"
 
-inetsim_ip: "192.168.100.2"
+inetsim_ip: "127.0.0.1"
 inetsim_dns_port: 53
 
 proxmox_ip: "127.0.0.1"
