@@ -247,17 +247,27 @@
     enabled: true
     daemon_reload: true
 
-- name: Setup cape-socksproxies.service unit file
-  template:
-    src: cape-socksproxies.service.j2
-    dest: /etc/systemd/system/cape-socksproxies.service
+#- name: Setup cape-socksproxies.service unit file
+#  template:
+#    src: cape-socksproxies.service.j2
+#    dest: /etc/systemd/system/cape-socksproxies.service
 
-- name: Restart cape-socksproxies and enable the service to run on boot
-  systemd:
-    name: cape-socksproxies
-    state: restarted
-    enabled: true
-    daemon_reload: true
+#- name: Restart cape-socksproxies and enable the service to run on boot
+#  systemd:
+#    name: cape-socksproxies
+#    state: restarted
+#    enabled: true
+#    daemon_reload: true
+
+- name: Setup smtp_sinkhole.sh
+  template:
+    src: smtp_sinkhole.sh.j2
+    dest: /opt/CAPEv2/utils/smtp_sinkhole.sh
+
+- name: Setup smtp_sinkhole.py
+  template:
+    src: smtp_sinkhole.py.j2
+    dest: /opt/CAPEv2/utils/smtp_sinkhole.py
 
 - name: Setup cape-smtp-sinkhole.service unit file
   template:

@@ -14,14 +14,12 @@
 # reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription" /v EnableTranscripting /t REG_DWORD /d 00000001 /f /reg:64
 # reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription" /v OutputDirectory /t REG_SZ /d C:\PSTranscipts /f /reg:64
 # reg add "HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\PowerShell\Transcription" /v EnableInvocationHeader /t REG_DWORD /d 00000001 /f /reg:64
-[curtain]
-enabled = yes
 
-[dlnexec]
-enabled = yes
-
-[sysmon]
-enabled = no
+#Modules to be enabled or not inside of the VM
+[auxiliar_modules]
+curtain = yes
+sysmon = no
+procmon = no
 
 [sniffer]
 # Enable or disable the use of an external sniffer (tcpdump) [yes/no].
@@ -52,11 +50,7 @@ INETSIM = {{ inetsim_ip }}
 # downloads for a comma-separated list of MD5/SHA1/SHA256 hashes
 enabled = no
 # note that unlike the VirusTotal processing module, the key required
-# here is a Private API key, not a Public API key
-#dlprivkey = SomeKeyWithDLAccess
-# alternatively if you have VirusTotal Intelligence access, you can
-# supply your Public API key below.  Only one of these keys may be
-# uncommented at a time.
+# here is a Intelligence API key, not a Public API key
 #dlintelkey = SomeKeyWithDLAccess
 dlpath = /tmp/
 
@@ -73,7 +67,7 @@ enabled = no
 
 [expanded_dashboard]
 # displays package, custom field, malfamily, clamav, PCAP link, and extended suricata results
-enabled = no
+enabled = yes
 
 [display_et_portal]
 enabled = no

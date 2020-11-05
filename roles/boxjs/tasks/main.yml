@@ -17,27 +17,22 @@
 - name: Install "hapi" node.js package globally.
   npm:
     name: hapi
-    global: true
 
 - name: Install "rimraf" node.js package globally.
   npm:
     name: rimraf
-    global: true
 
 - name: Install "express" node.js package globally.
   npm:
     name: express
-    global: true
 
 - name: Install "express-fileupload" node.js package globally.
   npm:
     name: express-fileupload
-    global: true
 
 - name: Install "body-parser" node.js package globally.
   npm:
     name: body-parser
-    global: true
 
 - name: Download the latest box-js source from git
   git:

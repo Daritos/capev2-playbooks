@@ -3,8 +3,8 @@ Description=A utility to analyze malicious JavaScript.
 
 [Service]
 Type=simple
-WorkingDirectory=/opt/box-js
-ExecStart=node integrations/api/api.js
+WorkingDirectory=/opt/box-js/integrations/api
+ExecStart=node api.js
 User=root
 Group=root
 Restart=always
