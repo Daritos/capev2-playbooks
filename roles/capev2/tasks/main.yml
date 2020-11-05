@@ -117,6 +117,68 @@
     dest: /opt/CAPEv2
     force: true
 
+###
+# MaliciousMacroBot
+###
+
+- name: Setup mmbot benign data directory
+  file:
+    path: /opt/CAPEv2/data/mmbot/benign
+    state: directory
+
+- name: Setup mmbot malicious data directory
+  file:
+    path: /opt/CAPEv2/data/mmbot/malicious
+    state: directory
+
+- name: Setup mmbot model data directory
+  file:
+    path: /opt/CAPEv2/data/mmbot/model
+    state: directory
+
+- name: Download benign model sample
+  get_url:
+    url: "https://github.com/egaus/MaliciousMacroBot/raw/master/tests/samples/modeldata.pickle"
+    dest: "/opt/CAPEv2/data/mmbot/model/modeldata.pickle"
+
+- name: Download mmbot vocab.txt
+  get_url:
+    url: "https://github.com/egaus/MaliciousMacroBot/raw/master/tests/samples/vocab.txt"
+    dest: "/opt/CAPEv2/data/mmbot/model/vocab.txt"
+
+- name: Download benign macro samples
+  get_url:
+    url: "{{ item.url }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - url: "https://github.com/egaus/MaliciousMacroBot/raw/master/tests/samples/benign.xlsm"
+      dest: "/opt/CAPEv2/data/mmbot/benign/benign.xlsm"
+    - url: "https://github.com/egaus/MaliciousMacroBot/raw/master/tests/samples/benign_1.xlsm"
+      dest: "/opt/CAPEv2/data/mmbot/benign/benign_1.xlsm"
+    - url: "https://github.com/egaus/MaliciousMacroBot/raw/master/tests/samples/benign_2.xlsm"
+      dest: "/opt/CAPEv2/data/mmbot/benign/benign_2.xlsm"
+    - url: "https://github.com/egaus/MaliciousMacroBot/raw/master/tests/samples/benign_3.xlsm"
+      dest: "/opt/CAPEv2/data/mmbot/benign/benign_3.xlsm"
+
+###
+# ja3fingerprint database
+###
+
+- name: Setup ja3 directory
+  file:
+    path: /opt/CAPEv2/data/ja3
+    state: directory
+
+- name: Download ja3 fingerprint db
+  get_url:
+    url: "https://raw.githubusercontent.com/trisulnsm/trisul-scripts/master/lua/frontend_scripts/reassembly/ja3/prints/ja3fingerprint.json"
+    dest: "/opt/CAPEv2/data/ja3/ja3fingerprint.json"
+
+- name: "Ensure whitelist_ips.txt exists"
+  file:
+    path: "/opt/CAPEv2/extra/whitelist_ips.txt"
+    state: touch
+
 - name: Push CAPE configuration
   template:
     src: "conf/{{ item.name }}.j2"

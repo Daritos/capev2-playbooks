@@ -76,6 +76,8 @@
     - libre2-dev
     - openjdk-11-jdk-headless
     - openjdk-8-jdk-headless
+    - haveged
+    - procyon-decompiler
     state: latest
 
 - name: Install python3 dependencies
@@ -155,6 +157,10 @@
     - flask-restful
     - flask-sqlalchemy
     - pyvmomi
+    - mmbot
+    - git+https://github.com/DissectMalware/XLMMacroDeobfuscator.git
+    - "networkx>=2.1"
+    - graphviz
     - proxmoxer
     executable: pip3
 

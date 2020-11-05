@@ -30,13 +30,22 @@ enabled = no
 enabled = yes
 
 [decompression]
-enabled = no
+enabled = yes
 
 [behavior]
 enabled = yes
 
 [debug]
 enabled = yes
+
+[detections]
+enabled = yes
+# Signatures
+behavior = yes
+yara = yes
+suricata = yes
+virustotal = yes
+clamav = yes
 
 [dropped]
 enabled = yes
@@ -52,12 +61,15 @@ enabled = yes
 enabled = yes
 strings = yes
 
+[procmon]
+enabled = no
+
 # volatility3 integration is coming soon
 [memory]
 enabled = no
 
 [usage]
-enabled = no
+enabled = yes
 
 [network]
 enabled = yes
@@ -68,23 +80,27 @@ enabled = yes
 dnswhitelist = yes
 # additional entries
 dnswhitelist_file = extra/whitelist_domains.txt
+ipwhitelist = yes
+ipwhitelist_file = extra/whitelist_ips.txt
 
 # Should the server use a compressed version of behavioural logs? This helps
 # in saving space in Mongo, accelerates searchs and reduce the size of the
 # final JSON report.
 [loop_detection]
-enabled = no
+enabled = yes
 
 [static]
 enabled = yes
 # Enable a WHOIS lookup for the target domain of a URL analyses
 whois = yes
-# If you want to use the Procyon Java decompiler, set the following to the path of its .jar
-# and make sure Java 7 is installed
-# Procyon is developed by Mike Strobel and is available at https://bitbucket.org/mstrobel/procyon/
-# In testing, it generally seems to produce the best Java decompilation
-# current in project 0.5.30
-procyon_path = data/procyon-decompiler.jar
+# If you want to use the Procyon Java decompiler, install procyon with
+# 'apt install procyon-decompiler'
+# or use the latest jar file and replace it in the path option
+# Uncomment the procyon_path option
+# In testing, it generally seems to produce the best Java decompilation:
+# if using apt version set it to /usr/bin/procyon
+#procyon_path = data/procyon.jar
+procyon_path = /usr/bin/procyon
 
 [strings]
 enabled = yes
@@ -93,7 +109,7 @@ minchars = 5
 
 [trid]
 # Specify the path to the trid binary to use for static analysis.
-enabled = no
+enabled = yes
 identifier = data/trid/trid
 definitions = data/trid/triddefs.trd
 
@@ -113,7 +129,7 @@ urlscrub = (^http:\/\/serw\.clicksor\.com\/redir\.php\?url=|&InjectedParam=.+$)
 
 [suricata]
 # Notes on getting this to work check install_suricata function:
-# https://github.com/doomedraven/Tools/blob/master/Cuckoo/cuckoo3.sh
+# https://github.com/doomedraven/Tools/blob/master/Sandbox/cape2.sh
 
 enabled = yes
 #Runmode "cli" or "socket"
@@ -141,7 +157,7 @@ zippass = infected
 bin = /usr/bin/suricata
 conf = /etc/suricata/suricata.yaml
 ##Runmode "socket" Options
-socket_file = /var/run/suricata/suricata-command.socket
+socket_file = /tmp/suricata-command.socket
 
 [cif]
 enabled = no
@@ -181,7 +197,7 @@ hashmethod = ahash
 # Mac - brew install graphviz
 # Ubuntu - sudo apt-get install graphviz
 # Arch - sudo pacman -S graphviz+
-# sudo pip install networkx>=2.1 graphviz>=0.8.4 pydot>=1.2.4
+# sudo pip3 install networkx>=2.1 graphviz>=0.8.4 pydot>=1.2.4
 enabled = yes
 
 # ja3 finger print db with descriptions
@@ -192,7 +208,7 @@ ja3_path = data/ja3/ja3fingerprint.json
 [maliciousmacrobot]
 # https://maliciousmacrobot.readthedocs.io
 # Install mmbot
-#   sudo pip install mmbot
+#   sudo pip3 install mmbot
 # Create/Set required paths
 # Populate benign_path and malicious_path with appropriate macro maldocs (try the tests/samples in the github)
 #   https://github.com/egaus/MaliciousMacroBot/tree/master/tests/samples
@@ -202,7 +218,16 @@ ja3_path = data/ja3/ja3fingerprint.json
 #   result = mmb.mmb_init_model(modelRebuild=True)
 #
 # Copy your model file and vocab.txt to your model_path
-enabled = no
-benign_path = /opt/cuckoo/data/mmbot/benign
-malicious_path = /opt/cuckoo/data/mmbot/malicious
-model_path = /opt/cuckoo/data/mmbot/model
+enabled = yes
+benign_path = /opt/CAPEv2/data/mmbot/benign
+malicious_path = /opt/CAPEv2/data/mmbot/malicious
+model_path = /opt/CAPEv2/data/mmbot/model
+
+[xlsdeobf]
+# pip3 install git+https://github.com/DissectMalware/XLMMacroDeobfuscator.git
+enabled = yes
+
+[boxjs]
+enabled = yes
+timeout = 60
+url = http://127.0.0.1:9000

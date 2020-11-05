@@ -1,0 +1,14 @@
+[Unit]
+Description=A utility to analyze malicious JavaScript.
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/box-js
+ExecStart=node integrations/api/api.js
+User=root
+Group=root
+Restart=always
+RestartSec=5m
+
+[Install]
+WantedBy=multi-user.target

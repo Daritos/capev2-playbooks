@@ -1,0 +1,58 @@
+- name: Install the gpg key for nodejs LTS
+  apt_key:
+    url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+    state: present
+
+- name: Install the nodejs LTS repos
+  apt_repository:
+    repo: "deb https://deb.nodesource.com/node_{{ NODEJS_VERSION }}.x {{ ansible_distribution_release }} main"
+    state: present
+    update_cache: yes
+
+- name: Install nodejs
+  apt:
+    name: nodejs
+    state: latest
+
+- name: Install "hapi" node.js package globally.
+  npm:
+    name: hapi
+    global: true
+
+- name: Install "rimraf" node.js package globally.
+  npm:
+    name: rimraf
+    global: true
+
+- name: Install "express" node.js package globally.
+  npm:
+    name: express
+    global: true
+
+- name: Install "express-fileupload" node.js package globally.
+  npm:
+    name: express-fileupload
+    global: true
+
+- name: Install "body-parser" node.js package globally.
+  npm:
+    name: body-parser
+    global: true
+
+- name: Download the latest box-js source from git
+  git:
+    repo: https://github.com/CapacitorSet/box-js.git
+    dest: /opt/box-js
+    force: true
+
+- name: Setup box-js-api.service unit file
+  template:
+    src: box-js-api.service.j2
+    dest: /etc/systemd/system/box-js-api.service
+
+- name: Restart box-js-api and enable the service to run on boot
+  systemd:
+    name: box-js-api
+    state: restarted
+    enabled: true
+    daemon_reload: true

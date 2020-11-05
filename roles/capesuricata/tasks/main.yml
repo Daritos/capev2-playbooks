@@ -45,9 +45,20 @@
       value: "default-rule-path: /etc/suricata/rules"
 
 - name: Deploy /etc/suricata/suricata.yaml
-  template:
-    src: suricata.yaml.j2
+  copy:
+    src: suricata.yaml
     dest: /etc/suricata/suricata.yaml
+
+- name: Adjust suricata configuration /etc/suricata/suricata.yaml
+  lineinfile:
+    dest: /etc/suricata/suricata.yaml
+    line: "{{ item.value }}"
+    regexp: "^{{ item.name }}"
+  with_items:
+    - name: "#?  user:"
+      value: "  user: {{ cape_user }}"
+    - name: "#?  group:"
+      value: "  group: {{ cape_user }}"
 
 - name: Set ownership of /etc/suricata
   file:
@@ -86,6 +97,10 @@
   shell:
     cmd: "/usr/bin/suricata-update --suricata /usr/bin/suricata --suricata-conf /etc/suricata/suricata.yaml -o /etc/suricata/rules/"
     creates: /etc/suricata/rules/suricata.rules
+  register: suricata_rule_update
+  retries: 5
+  delay: 5
+  until: suricata_rule_update is success
 
 - name: Create cronjob for updating rules
   cron:
