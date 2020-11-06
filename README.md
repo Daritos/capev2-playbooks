@@ -1,5 +1,5 @@
 # capev2-playbooks
-This repository contains ansible roles and playbook to deploy CAPEv2 on Ubuntu 20.04 (may work on other versions as well) and is based of doomdraven's [cape2.sh](https://github.com/doomedraven/Tools/blob/master/Sandbox/cape2.sh) install script.
+This repository contains ansible roles and playbook to assist in deploying CAPEv2 and all dependencies on Ubuntu 20.04 (may work on other versions as well) and is based of doomdraven's [cape2.sh](https://github.com/doomedraven/Tools/blob/master/Sandbox/cape2.sh) install script.
 
 ## Setup
 Install git
@@ -52,8 +52,6 @@ Insert the following and adjust according to your needs
         },
         "vars" : {
             "ansible_python_interpreter": "/usr/bin/python3",
-            "elastic_version": "7.9.3",
-            "npcap_version": "1.00",
             "cape_user": "cape",
             "cape_db_user": "cape",
             "cape_db_password": "changeme",
@@ -65,36 +63,6 @@ Insert the following and adjust according to your needs
             "tor_listening_ip": "127.0.0.1",
             "cert_common_name": "localhost",
             "external_fqdn": "example.tld",
-            "inetsim_ip": "127.0.0.1",
-            "inetsim_dns_port": 53,
-            "misp_enabled": "no",
-            "misp_url": "https://localhost",
-            "misp_apikey": "REPLACE_ME",
-            "misp_auto_publish": "no",
-            "misp_min_malscore": 0,
-            "misp_enrich_cape_report": "no",
-            "misp_distribution": 0,
-            "misp_report_threat_level_id": 2,
-            "misp_report_analysis_state": 2,
-            "misp_send_ioc": "no",
-            "misp_include_network_ioc": "yes",
-            "misp_include_ids_ioc": "yes",
-            "misp_include_dropedfiles_ioc": "yes",
-            "misp_include_registry_ioc": "no",
-            "misp_include_mutexes_ioc": "no",
-            "proxmox_ip": "REPLACE_ME",
-            "proxmox_user": "REPLACE_ME",
-            "proxmox_password": "REPLACE_ME",
-            "proxmox_active_vms": "win7",
-            "proxmox_vms": [
-                {
-                    "name": "win7",
-                    "platform": "windows",
-                    "ip": "192.168.100.10",
-                    "snapshot": "clean",
-                    "tags": "64x"
-                }
-            ]
         }
     }
 }

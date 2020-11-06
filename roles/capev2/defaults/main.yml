@@ -8,12 +8,13 @@ cape_vm_subnet_ip: "192.168.100.1"
 cape_vm_subnet_interface: "virbr1"
 cape_nr_processor: 2
 cape_machinery: "kvm"
-cape_inetsim_interface: "virbr1"
 
 external_fqdn: "localhost"
 
+inetsim_enabled: "no"
 inetsim_ip: "127.0.0.1"
 inetsim_dns_port: 53
+inetsim_interface: "virbr1"
 
 proxmox_ip: "127.0.0.1"
 proxmox_user: "root"

@@ -217,6 +217,16 @@
     cmd: python3 utils/community.py -af
     chdir: /opt/CAPEv2
 
+- name: Check for trid updates
+  shell:
+    cmd: python3 tridupdate.py triddefs.trd
+    chdir: /opt/CAPEv2/data/trid
+
+- name: Set permissions for trid
+  file:
+    path: /opt/CAPEv2/data/trid/trid
+    mode: 0755
+
 - name: Set proper ownership of /opt/CAPEv2
   file:
     path: /opt/CAPEv2
@@ -270,6 +280,7 @@
     dest: /opt/CAPEv2/utils/smtp_sinkhole.sh
     owner: "{{ cape_user }}"
     group: "{{ cape_user }}"
+    mode: 0755
 
 - name: Setup smtp_sinkhole.py
   copy:

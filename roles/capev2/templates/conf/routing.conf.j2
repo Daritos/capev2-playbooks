@@ -48,14 +48,14 @@ drop = no
 # tar xvf remnux-6.0-ova-public.ova
 # qemu-img convert -O qcow2 REMnuxV6-disk1.vmdk remnux.qcow2
 
-enabled = yes
+enabled = {{ inetsim_enabled }}
 server = {{ inetsim_ip }}
 dnsport = {{ inetsim_dns_port }}
-#interface = {{ cape_inetsim_interface }}
+interface = {{ inetsim_interface }}
 # Redirect TCP ports (should we also support UDP?). If specified, this should
 # represent whitespace-separated src:dst pairs. E.g., "80:8080 443:8080" will
 # redirect all 80/443 traffic to 8080 on the specified InetSim host.
-ports =
+#ports =
 
 
 [tor]
@@ -99,7 +99,7 @@ rt_table = tun0
 [socks5]
 # By default we disable socks5 support as it requires running utils/rooter.py as
 # root next to cuckoo.py (which should run as regular user).
-enabled = yes
+enabled = no
 
 # Comma-separated list of the available proxies.
 proxies = socks_ch
