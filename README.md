@@ -1,5 +1,5 @@
 # capev2-playbooks
-This repository contains ansible roles and playbook to assist in deploying CAPEv2 and all dependencies on Ubuntu 20.04 (may work on other versions as well) and is based of doomdraven's [cape2.sh](https://github.com/doomedraven/Tools/blob/master/Sandbox/cape2.sh) install script.
+This repository contains a few ansible roles and playbook to assist with deploying CAPEv2 and it's dependencies on Ubuntu 20.04 (may work on other versions as well) and is based of doomdraven's [cape2.sh](https://github.com/doomedraven/Tools/blob/master/Sandbox/cape2.sh) install script.
 
 ## Setup
 Install git
@@ -16,10 +16,10 @@ cd capev2-playbooks
 ```
 
 ### Install ansible
-Install dependencies for ansible
+Install dependencies
 
 ```bash
-sudo apt -y install curl python python-dev apt-transport-https ca-certificates software-properties-common
+sudo apt -y install curl python3 python3-dev apt-transport-https ca-certificates software-properties-common
 ```
 
 Add the Ansible repository NOTE! Skip if on Ubuntu 20.04
