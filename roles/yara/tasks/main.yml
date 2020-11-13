@@ -13,6 +13,10 @@
     - jq
     - autoconf
     - checkinstall
+    - automake
+    - make
+    - gcc
+    - pkg-config
 
 - name: Get latest release tag from Yara repo
   uri:
