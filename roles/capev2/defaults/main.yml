@@ -9,6 +9,11 @@ cape_vm_subnet_interface: "virbr1"
 cape_nr_processor: 2
 cape_machinery: "kvm"
 
+cape_tor_enabled: "yes"
+cape_tor_dnsport: 5353
+cape_tor_proxyport: 9040
+cape_tor_interface: "{{ cape_vm_subnet_interface }}"
+
 external_fqdn: "localhost"
 
 inetsim_enabled: "no"
