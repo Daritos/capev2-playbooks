@@ -1,0 +1,54 @@
+
+- name: Download CAPA source code
+  git:
+    repo: "https://github.com/mandiant/capa.git"
+    dest: "/opt/capa"
+    recursive: true
+
+- name: Update and initialize CAPA and rules
+  command:
+    cmd: "{{ item }}"
+    chdir: "/opt/capa"
+  loop:
+    - git pull
+    - git submodule update --init rules
+
+- name: Install CAPA
+  pip:
+    name: capa
+    state: present
+    executable: pip3
+    extra_args: "--no-index --find-links=file:////opt/capa"
+       
+
+- name: Create CAPA rules and signatures directories
+  file:
+    path: "/opt/CAPEv2/data/{{ item }}"
+    state: directory
+  loop:
+    - capa-rules
+    - capa-signatures
+
+- name: Download CAPA rules
+  git:
+    repo: "{{ capa_rules_repo }}"
+    dest: "/opt/CAPEv2/data/capa-rules"
+    force: true
+    update: true
+
+- name: Download CAPA signatures
+  get_url:
+    url: "{{ item }}"
+    dest: "/opt/CAPEv2/data/capa-signatures"
+  loop: 
+    - https://github.com/fireeye/capa/raw/master/sigs/1_flare_msvc_rtf_32_64.sig
+    - https://github.com/fireeye/capa/raw/master/sigs/2_flare_msvc_atlmfc_32_64.sig
+    - https://github.com/fireeye/capa/raw/master/sigs/3_flare_common_libs.sig
+
+- name: Set permissions on CAPA directory
+  file:
+    path: "/opt/CAPEv2/data"
+    state: directory
+    recurse: true
+    owner: "{{ cape_user }}"
+    group: "{{ cape_user }}"
